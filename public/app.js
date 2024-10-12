@@ -45,6 +45,44 @@ socket.on('stockfish-move', (move) => {
     updateStatus();
 });
 
+async function analyzeChessPosition(position) {
+    const url = 'https://openwebui.local/ollama/api/chat';
+    const headers = {
+        'Accept': 'application/json',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijc4OGI1YWNkLTFiMjktNDJkYy1hYmYxLTY4ZTVjNjY1NGM2YSJ9.tUguBdQkuQon3_Ryp1c5nLVC1-Xl_JQCB0JDNXwLQns',
+        'Connection': 'keep-alive',
+        'Content-Type': 'application/json'
+    };
+    const body = JSON.stringify({
+        stream: false,
+        model: 'llama3.2:latest',
+        messages: [
+            {
+                role: 'user',
+                content: `Analyze the following chess position and help me play the best next move: ${position}`
+            }
+        ]
+    });
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: headers,
+            body: body
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+
 function updateStatus() {
     let status;
     let moveColor = 'White';
@@ -80,4 +118,7 @@ function updateStatus() {
     // Update the `pgn` element with the current game state
     document.getElementById('pgn').textContent = formatPgn(pgn);
 
+    analyzeChessPosition(pgn).then(data => {
+        console.log('LLM Response:', data);
+    });
 }
