@@ -72,11 +72,11 @@ async function analyzeChessPosition(position) {
             body: body
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        if (response.ok) {
+            return await response.json();
+        } else {
+            console.error(`HTTP error! status: ${response.status}`);
         }
-
-        return await response.json();
     } catch (error) {
         console.error('Error:', error);
     }
@@ -118,7 +118,12 @@ function updateStatus() {
     // Update the `pgn` element with the current game state
     document.getElementById('pgn').textContent = formatPgn(pgn);
 
-    analyzeChessPosition(pgn).then(data => {
-        console.log('LLM Response:', data);
-    });
 }
+
+// create a handler for the analyzeBtn click event
+document.getElementById('analyzeBtn').addEventListener('click', () => {
+    analyzeChessPosition(game.pgn()).then(data => {
+        // update the analysisResult element with the response
+        document.getElementById('analysisResult').textContent = data.message.content;
+    });
+});
