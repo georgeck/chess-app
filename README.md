@@ -26,7 +26,7 @@ pnpm start
 - Play against the computer
 - Analysis board with LLM running locally using [ollama](https://ollama.com/) and [Open WebUI](https://openwebui.com/).
  
-### how it works:
+### How it works:
 The client renders the chess board using `chessboardjs`. Each move is validated using `chess.js`. The client sends the move to the server (using socket.io), which then sends the move to the STOCKFISH engine. 
 The engine calculates the best move and sends it back to the client (again using socket.io). The client renders the move on the board.
 
