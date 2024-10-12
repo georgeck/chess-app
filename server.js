@@ -22,7 +22,7 @@ const game = new Chess();
 const stockfish = spawn('/Users/george/work/chess-app/stockfish');
 
 stockfish.stdin.write('uci\n');
-stockfish.stdin.write('setoption name Threads value 6\n');
+stockfish.stdin.write('setoption name Threads value 12\n');
 
 stockfish.stdout.on('data', (data) => {
     const output = data.toString();
