@@ -4,6 +4,9 @@ const socketIo = require('socket.io');
 const { spawn } = require('child_process');
 const Chess = require('chess.js').Chess;
 
+require('dotenv').config();
+
+
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
@@ -11,18 +14,26 @@ const io = socketIo(server);
 // Serve static files from the public directory
 app.use(express.static('public'));
 
-server.listen(3000, () => {
-    console.log('Server is running on port 3000');
+// Use PORT from .env or default to 3000
+const PORT = process.env.PORT || 3000;
+
+// Start the server
+server.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
 
 // Initialize a new chess game
 const game = new Chess();
 
+// Path to Stockfish binary or default to current directory
+const stockfishPath = process.env.STOCKFISH_PATH || './';
+
 // Spawn Stockfish process
-const stockfish = spawn('/Users/george/work/chess-app/stockfish');
+const stockfish = spawn(`${stockfishPath}stockfish`);
 
 stockfish.stdin.write('uci\n');
-stockfish.stdin.write('setoption name Threads value 12\n');
+const THREADS = process.env.STOCKFISH_THREADS || 2;
+stockfish.stdin.write(`setoption name Threads value ${THREADS}\n`);
 
 stockfish.stdout.on('data', (data) => {
     const output = data.toString();
