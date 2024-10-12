@@ -7,6 +7,16 @@ const board = Chessboard('board', {
 
 const game = new Chess();
 
+// Handle reset game button
+document.getElementById('resetBtn').addEventListener('click', () => {
+    game.reset();
+    board.position(game.fen());
+    updateStatus();
+
+    // Send reset event to server
+    socket.emit('reset');
+});
+
 function onDrop(source, target) {
     // console.log('onDrop:', source, target);
     const move = game.move({
@@ -14,8 +24,6 @@ function onDrop(source, target) {
         to: target,
         promotion: 'q' // Always promote to queen for simplicity
     });
-
-    // console.log('onDrop:', move);
 
     if (move === null)
         return 'snapback';
@@ -33,9 +41,6 @@ socket.on('stockfish-move', (move) => {
         to: move.slice(2, 4)
     };
     game.move(move);
-    // console.log(game.ascii());
-
-    // console.log(game.fen());
     board.position(game.fen());
     updateStatus();
 });
@@ -58,6 +63,5 @@ function updateStatus() {
             status += `, ${moveColor} is in check`;
         }
     }
-
     console.log(status);
 }

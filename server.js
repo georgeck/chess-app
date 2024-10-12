@@ -1,11 +1,10 @@
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
-const { spawn } = require('child_process');
+const {spawn} = require('child_process');
 const Chess = require('chess.js').Chess;
 
 require('dotenv').config();
-
 
 const app = express();
 const server = http.createServer(app);
@@ -43,8 +42,8 @@ stockfish.stdout.on('data', (data) => {
     const bestMoveLine = lines.find((line) => line.startsWith('bestmove'));
     if (bestMoveLine) {
         const bestMove = bestMoveLine.split(' ')[1];
-        game.move({ from: bestMove.slice(0, 2), to: bestMove.slice(2, 4) });
-        console.log('stockfish-move', bestMove, '\n' ,game.ascii());
+        game.move({from: bestMove.slice(0, 2), to: bestMove.slice(2, 4)});
+        console.log('stockfish-move', bestMove, '\n', game.ascii());
         io.emit('stockfish-move', bestMove);
     }
 });
@@ -73,6 +72,18 @@ io.on('connection', (socket) => {
         } else {
             console.log('Invalid move:', move);
         }
+    });
+
+    function reset() {
+        console.log('Resetting game');
+        game.reset();
+        stockfish.stdin.write(`position startpos\n`);
+        stockfish.stdin.write('d\n');
+    }
+
+    // Handle reset event
+    socket.on('reset', () => {
+        reset();
     });
 
     socket.on('disconnect', () => {
