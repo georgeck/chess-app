@@ -1,15 +1,18 @@
 # chess-app
 Simple chess game that uses STOCKFISH engine. 
 
-Download the STOCKFISH engine from https://stockfishchess.org/download/ and place it in the same directory as the server.js file. 
+## Setup
 
-If you have the binary file in a different directory, then update the path in the .env file.
+1. Download the STOCKFISH engine from [stockfishchess.org](https://stockfishchess.org/download/) and place it in the same directory as the `server.js` file.
+2. If you have the binary file in a different directory, update the path in the `.env` file.
 
+## Running the App
 To run the app, execute the following commands:
 ```
 pnpm install
 pnpm start
 ```
+
 ### Libraries used:
 - [chess.js](https://github.com/jhlywa/chess.js) ->  JavaScript library for chess move validation and check/checkmate/draw detection
 - [chessboard-js](https://chessboardjs.com/) -> JavaScript chessboard
