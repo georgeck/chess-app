@@ -1,4 +1,4 @@
-# chess-app
+# Chess App
 Simple chess game that uses STOCKFISH engine. 
 
 ## Setup
