@@ -1,5 +1,5 @@
 # Chess App
-Simple chess game that uses STOCKFISH engine. 
+Simple chess game that you can run locally that uses STOCKFISH engine and use LLMs for game analysis. 
 
 ## Setup
 
