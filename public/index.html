@@ -12,19 +12,40 @@
             width: 800px;
             margin: 20px auto;
         }
+        .board-container {
+            margin-top: 40px; /* Add top margin here */
+        }
     </style>
 </head>
 <body>
-<div id="board"></div>
-<div class="container">
+<!-- The board and a text box that renders the PGN status -->
+<div class="container  board-container">
+    <div class="row" >
+        <div class="col-md-9">
+            <div id="board"></div>
+        </div>
+        <div class="col-md-3">
+            <div id="status" class="text-center">
+                <form>
+                    <div class="mb-3">
+                        <label for="pgn" class="form-label text-start">PGN</label>
+                        <textarea id="pgn" class="form-control" rows="30" style="height: 100%;" readonly></textarea>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <div class="row">
-        <div class="col-md-12">
-            <div class="d-flex justify-content-center">
+        <div class="col-md-9">
+            <div class="d-flex justify-content-end">
                 <button class="btn btn-danger" id="resetBtn">Reset Game</button>
             </div>
         </div>
     </div>
 </div>
+
+
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>

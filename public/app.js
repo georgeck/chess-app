@@ -64,4 +64,20 @@ function updateStatus() {
         }
     }
     console.log(status);
+
+    const pgn = game.pgn();
+
+    // Format the PGN to show each move on a new line
+    function formatPgn(pgn) {
+        // Split the PGN into an array of moves
+        const moves = pgn.split(/\d+\./).slice(1);
+        return moves.map((move, i) => {
+            // Add the move number to the start of each move
+            return `${i + 1}. ${move}`;
+        }).join('\n');
+    }
+
+    // Update the `pgn` element with the current game state
+    document.getElementById('pgn').textContent = formatPgn(pgn);
+
 }
