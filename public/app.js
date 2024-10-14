@@ -13,6 +13,12 @@ document.getElementById('resetBtn').addEventListener('click', () => {
     board.position(game.fen());
     updateStatus();
 
+    // Clear the PGN
+    document.getElementById('pgn').textContent = '';
+
+    // Clear the analysis result
+    document.getElementById('analysisResult').textContent = '';
+
     // Send reset event to server
     socket.emit('reset');
 });
@@ -33,16 +39,14 @@ function onDrop(source, target) {
     updateStatus();
 }
 
-socket.on('stockfish-move', (move) => {
-    // console.log('stockfish-move',move);
-    // move is in format 'c7c5' - convert to { from: 'c7', to: 'c5' }
+socket.on('stockfish-move', (move, ponderingMove) => {
     move = {
         from: move.slice(0, 2),
         to: move.slice(2, 4)
     };
     game.move(move);
     board.position(game.fen());
-    updateStatus();
+    updateStatus(ponderingMove);
 });
 
 async function analyzeChessPosition(position) {
@@ -60,7 +64,7 @@ async function analyzeChessPosition(position) {
         messages: [
             {
                 role: 'user',
-                content: `Analyze the following chess position and help me play the best next move: ${position}`
+                content: `Analyze the following chess position and help white play the best next move: ${position}`
             }
         ]
     });
@@ -83,7 +87,7 @@ async function analyzeChessPosition(position) {
 }
 
 
-function updateStatus() {
+function updateStatus(ponderingMove) {
     let status;
     let moveColor = 'White';
 
@@ -92,16 +96,16 @@ function updateStatus() {
     }
 
     if (game.in_checkmate()) {
-        status = `Game over, ${moveColor} is in checkmate.`;
+        status = `<mark>Game over</mark>, ${moveColor} is in <mark>checkmate</mark>.`;
     } else if (game.in_draw()) {
-        status = 'Game over, drawn position';
+        status = '<mark>Game over, drawn position</mark>';
     } else {
-        status = `${moveColor} to move`;
+        status = `${moveColor} to move; computer pondering: ${ponderingMove}`;
         if (game.in_check()) {
-            status += `, ${moveColor} is in check`;
+            status += `, ${moveColor} is in <mark>check</mark>`;
         }
     }
-    console.log(status);
+    document.getElementById('status-text').innerHTML = status;
 
     const pgn = game.pgn();
 
@@ -122,6 +126,9 @@ function updateStatus() {
 
 // create a handler for the analyzeBtn click event
 document.getElementById('analyzeBtn').addEventListener('click', () => {
+    // reset the analysisResult element
+    document.getElementById('analysisResult').textContent = 'Analyzing...';
+
     analyzeChessPosition(game.pgn()).then(data => {
         // update the analysisResult element with the response
         document.getElementById('analysisResult').textContent = data.message.content;

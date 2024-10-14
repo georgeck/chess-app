@@ -31,8 +31,23 @@ const stockfishPath = process.env.STOCKFISH_PATH || './';
 const stockfish = spawn(`${stockfishPath}stockfish`);
 
 stockfish.stdin.write('uci\n');
+
+// Set Stockfish threads
 const THREADS = process.env.STOCKFISH_THREADS || 2;
 stockfish.stdin.write(`setoption name Threads value ${THREADS}\n`);
+
+// Set Stockfish hash
+const HASH = process.env.STOCKFISH_HASH || 1024;
+stockfish.stdin.write(`setoption name Hash value ${HASH}\n`);
+
+// Set Stockfish skill level
+const SKILL_LEVEL = process.env.STOCKFISH_SKILL_LEVEL || 20;
+stockfish.stdin.write(`setoption name Skill Level value ${SKILL_LEVEL}\n`);
+
+// Set Stockfish analysis parameters
+stockfish.stdin.write(`setoption name MultiPV value 1\n`);
+stockfish.stdin.write(`setoption name UCI_LimitStrength value false\n`);
+stockfish.stdin.write(`setoption name UCI_ShowWDL value true\n`);
 
 stockfish.stdout.on('data', (data) => {
     const output = data.toString();
@@ -42,9 +57,10 @@ stockfish.stdout.on('data', (data) => {
     const bestMoveLine = lines.find((line) => line.startsWith('bestmove'));
     if (bestMoveLine) {
         const bestMove = bestMoveLine.split(' ')[1];
+        const ponderMove = bestMoveLine.split(' ')[3];
         game.move({from: bestMove.slice(0, 2), to: bestMove.slice(2, 4)});
         console.log('stockfish-move', bestMove, '\n', game.ascii());
-        io.emit('stockfish-move', bestMove);
+        io.emit('stockfish-move', bestMove, ponderMove);
     }
 });
 
@@ -93,7 +109,8 @@ io.on('connection', (socket) => {
 
 // Graceful shutdown
 process.on('SIGINT', () => {
-    console.log('Shutting down server...');
+    console.log('\nShutting down server...');
+    stockfish.stdin.write(`quit\n`);
     stockfish.kill();
     server.close(() => {
         console.log('Server closed');
@@ -101,7 +118,6 @@ process.on('SIGINT', () => {
     });
     // exit the node process immediately
     setTimeout(() => {
-        console.error('forcefully shutting down');
         process.exit(0);
     }, 100);
 });
